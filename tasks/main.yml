@@ -1,4 +1,7 @@
 ---
+# Include variables and define needed variables.
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Install required packages
   package:
@@ -18,14 +21,22 @@
   with_items:
     - 'etc/default/nfs-common'
   register: nfs__register_config
+  when: ansible_os_family == "Debian"
 
-- name: Restart nfs-common service
+- name: Restart nfs service Debian
   service:
-    name: 'nfs-common'
+    name: '{{ nfs_utils_daemon }}'
     state: 'restarted'
   when: nfs__register_config|changed and
         ansible_distribution == 'Debian' and
         ansible_distribution_release in [ 'wheezy', 'jessie' ]
+
+- name: Restart nfs service RedHat
+  service:
+    name: '{{ nfs_utils_daemon }}'
+    state: 'restarted'
+  when: nfs__register_config|changed and
+        ansible_os_family == 'RedHat'
 
 - name: Manage NFS mount points
   mount:

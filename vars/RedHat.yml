@@ -1,0 +1,5 @@
+---
+nfs_server_daemon: nfs-server
+nfs_utils_daemon: nfs-utils
+nfs__base_packages:
+  - nfs-utils
